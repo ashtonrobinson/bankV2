@@ -8,8 +8,7 @@ import "./Wallet.sol";
 
 // this is a multisignature account generator contract
 contract Bank is Ownable {
-    // store each Account
-    // this needs to be optimized
+    // store each wallet address
     address[] public wallets;
     
     // backup keys associated with the bank(issuer of accounts) used for account creation
@@ -134,8 +133,6 @@ contract Bank is Ownable {
     }
 
     //create an account, the owner of the Bank passes the names of the account to create
-    // these are temporarily held until one of the approvers passes the  addresses to use 
-    // when the wallet is created
     function createAccount() 
         public
         isInitiated

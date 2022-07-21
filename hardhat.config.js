@@ -1,7 +1,8 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
 
-require('dotenv').config();
+const dotenv = require('dotenv');
+dotenv.config();
 
 //create a task that can deploy to testnet and save the metadata associated with the deployment
 
@@ -23,7 +24,8 @@ extendEnvironment((hre) => {
   hre.chooseThree = (upper) => choose(upper, 3);
 });
 
-const alchemyKey = process.env.ALCHEMY;
+const alchemyGoerliKey = process.env.ALCHEMY_GOERLI;
+const alchemyMainnetKey = process.env.ALCHEMY_MAINNET;
 const devKey = `0x`+ process.env.DEPLOYER;
 
 const appKeyOne = `0x`+ process.env.APPROVER_ONE;
@@ -62,9 +64,13 @@ module.exports = {
       ],
     },
     goerli: {
-      url: `https://eth-goerli.alchemyapi.io/v2/${alchemyKey}`,
+      url: `https://eth-goerli.alchemyapi.io/v2/${alchemyGoerliKey}`,
       chainId: 5,
       accounts: [devKey, appKeyOne, appKeyTwo, appKeyThree, bankAppKeyOne, bankAppKeyTwo],
+    }, 
+    mainnet: {
+      url: `https://eth-mainnet.g.alchemy.com/v2/${alchemyMainnetKey}`,
+      chainId: 1,
     }
   },
   solidity: {

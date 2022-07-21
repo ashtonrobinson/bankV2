@@ -69,7 +69,7 @@ describe("Bank Contract Testing Suite", function () {
             expect(await Bank.initiated()).to.equal(false);
 
             //all functions should revert
-            await expect(Bank.createAccount('Ash', 'Rob')).to.be.revertedWith("contract has not been initiated yet");
+            await expect(Bank.createAccount()).to.be.revertedWith("contract has not been initiated yet");
             await expect(Bank.revokePendingAccount()).to.be.revertedWith("contract has not been initiated yet");
             await expect(bankConnTwo.deployAccount(walletAddresses)).to.be.revertedWith("contract has not been initiated yet")
         });
@@ -113,22 +113,20 @@ describe("Bank Contract Testing Suite", function () {
         //test 1, incorrect account creation, no current accounts
         it('Incorrect Account creation, no current accounts', async function () {
             //account creation from someone other than an owner
-            await expect(bankConnTwo.createAccount('Ash', 'Rob')).to.be.revertedWith("Ownable: caller is not the owner");
+            await expect(bankConnTwo.createAccount()).to.be.revertedWith("Ownable: caller is not the owner");
             
             //attempt to revoke the pending account when there is no pending account
             await expect(Bank.revokePendingAccount()).to.be.revertedWith("no pending account");
 
             // correctly create an account and then attempt to create another 
-            await expect(Bank.createAccount('Ash', 'Rob')).to.emit(Bank, 'AccountCreated');
-            await expect(Bank.createAccount('Other', 'Person')).to.be.revertedWith( "pending account exists");
+            await expect(Bank.createAccount()).to.emit(Bank, 'AccountCreated');
+            await expect(Bank.createAccount()).to.be.revertedWith( "pending account exists");
         });
 
 
         //test 2, correct creation and confirmation from approver
         it('correct creation, approval tests', async function () {
-            first = 'Ash';
-            last = 'Rob';
-            await Bank.createAccount(first, last);
+            await Bank.createAccount();
 
             // use a non approver address to deploy(in this case the owner of the Bank)
             await expect(Bank.deployAccount(walletAddresses)).to.be.revertedWith( "only approvers");
@@ -152,9 +150,7 @@ describe("Bank Contract Testing Suite", function () {
 
         //test 3, attempt to create a account with invalid wallet addresses
         it('correct creation, invalid wallet addresses', async function () {
-            first = 'Rob';
-            last = 'Tom';
-            await Bank.createAccount(first, last);
+            await Bank.createAccount();
 
             //use extra signers addresses as fillers to deploy the account
             extraAddrs = extraSigners.map(sign => sign.address);

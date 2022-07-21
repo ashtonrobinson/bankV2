@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Wallet is Ownable{
     //defines the parameters for multisignature wallets
-    uint immutable private MAX_APPROVERS = 3;   
+    uint constant private MAX_APPROVERS = 3;   
 
     // list of addresses associted with this wallet
     address[3] public approvers;
