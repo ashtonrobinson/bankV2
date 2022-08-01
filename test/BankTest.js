@@ -36,7 +36,7 @@ describe("Bank Contract Testing Suite", function () {
             walletApprovers.push(signers[index]);
         }
 
-        nonWalletApprovers = signers.filter(sign => !walletApprovers.includes(sign) && sign != owner);
+        nonWalletApprovers = signers.filter(sign => !walletApprovers.includes(sign));
         indicies = hre.choose(nonWalletApprovers.length, 2);
 
         for (i = 0; i < nonWalletApprovers.length; i++){
@@ -138,7 +138,7 @@ describe("Bank Contract Testing Suite", function () {
                 .to.be.revertedWith("cannot be zero address");
 
             //correctly deploy the account
-            expect(await bankConnTwo.deployAccount(walletAddresses)).to.emit(Bank, 'AccountDeployed');
+            expect(await bankConnTwo.deployAccount(walletAddresses)).to.emit(Bank, 'WalletDeployed');
             acctCreatedAddr = (await Bank.getAccountAddresses())[0];
 
             // assert that the account is of length one

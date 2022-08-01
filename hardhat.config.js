@@ -22,10 +22,28 @@ extendEnvironment((hre) => {
   } 
   hre.choose = choose;
   hre.chooseThree = (upper) => choose(upper, 3);
+
+  function filterAddresses(signers,approvers){
+    const indicies = hre.chooseThree(signers.length);
+    for(const index of indicies) {
+        const appr = signers[index]
+        approvers.push(appr);
+    }
+  }
+  hre.filterAddresses = filterAddresses;
+
+  // list of signer like objects
+  function getAddresses(signers){
+    return signers.map(sign => sign.address);
+  } 
+  hre.getAddresses = getAddresses;
 });
 
 const alchemyGoerliKey = process.env.ALCHEMY_GOERLI;
 const alchemyMainnetKey = process.env.ALCHEMY_MAINNET;
+
+// the following keys come from plaintext in the .env variable
+// do not use for interaction on mainnet
 const devKey = `0x`+ process.env.DEPLOYER;
 
 const appKeyOne = `0x`+ process.env.APPROVER_ONE;
@@ -40,6 +58,7 @@ const extraKeyTwo = `0x` + process.env.EXTRA_KEY_TWO;
 const extraKeyThree = `0x` + process.env.EXTRA_KEY_THREE;
 const extraKeyFour = `0x` + process.env.EXTRA_KEY_FOUR;
 const extraKeyFive = `0x` + process.env.EXTRA_KEY_FIVE;
+// end plaintext keys 
 
 
 /**
@@ -64,13 +83,14 @@ module.exports = {
       ],
     },
     goerli: {
-      url: `https://eth-goerli.alchemyapi.io/v2/${alchemyGoerliKey}`,
+      url: `https://eth-goerli.g.alchemy.com/v2/${alchemyGoerliKey}`,
       chainId: 5,
       accounts: [devKey, appKeyOne, appKeyTwo, appKeyThree, bankAppKeyOne, bankAppKeyTwo],
     }, 
     mainnet: {
       url: `https://eth-mainnet.g.alchemy.com/v2/${alchemyMainnetKey}`,
       chainId: 1,
+      accounts: []
     }
   },
   solidity: {

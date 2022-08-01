@@ -26,10 +26,7 @@ contract Wallet is Ownable{
 
     event Deposit(address indexed from, uint amount);
     event SubmitTransaction(
-        address indexed creator,
-        address indexed to, 
-        uint value,
-        bytes data
+        address indexed creator
     );
     event RevokePendingTransaction(address indexed creator);
     event TransactionExecuted(address indexed confirmer);
@@ -56,16 +53,6 @@ contract Wallet is Ownable{
     // check that the contract has enough funds to send
     modifier balanceExists(uint value){
         require(address(this).balance >= value, "contract needs more funds");
-        require(value > 0 wei, "cannot send nothing");
-        _;
-    }
-
-    // check that the address is valid
-    modifier validAddress(address addr) {
-        require(address(this) != addr, "cannot send to contract's address");
-        require(addr != address(0), "cannot send to null address");
-        // the function owner() is inhereited from Ownable and returns the address that deployed this contract
-        require(addr != owner(), "cannot send to creator of this wallet");
         _;
     }
 
@@ -110,14 +97,13 @@ contract Wallet is Ownable{
     }
 
     // create and confirm a transaction from one of the verified addresses
-    // requires value < than acct balance and value > 0
+    // requires value < than acct balance
     // address cannot be 0x0, the address of the contract itself, or the creator of the wallet
     function createTransaction(address _dest, uint _value, bytes memory _data) 
         public
         onlyApprover
         noPendingTransaction
         balanceExists(_value)
-        validAddress(_dest)
     {
         pendingTransaction = Transaction({
             destination: _dest,
@@ -128,7 +114,7 @@ contract Wallet is Ownable{
 
         hasPendingTransaction = true;
 
-        emit SubmitTransaction(msg.sender, _dest, _value, _data);
+        emit SubmitTransaction(msg.sender);
     }
 
 
@@ -156,6 +142,8 @@ contract Wallet is Ownable{
 
         if (success){
             emit TransactionExecuted(confirmer);
+        } else {
+            revert("unable to execute");
         }
     }
 }

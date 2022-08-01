@@ -13,8 +13,7 @@ describe("Wallet Contract Testing Suite", function () {
     let signers;
     // list of 3 signer objects that are the approvers of the wallet
     let approvers;
-    // addresses of the 3 approvers
-    let addresses;
+
 
     // the balance after ether has been recieved to the wallet
     let balanceAfter;
@@ -27,17 +26,11 @@ describe("Wallet Contract Testing Suite", function () {
         // pull out owners to test contract with
         [owner, ...signers] = await ethers.getSigners();
 
-        addresses = new Array();
         approvers = new Array();
 
-        const indicies = hre.chooseThree(signers.length);
-        for(const index of indicies) {
-            const appr = signers[index]
-            approvers.push(appr);
-            addresses.push(appr.address);
-        }
+        hre.filterAddresses(signers, approvers);
 
-        Wallet = await WalletFactory.deploy(addresses);
+        Wallet = await WalletFactory.deploy(hre.getAddresses(approvers));
         await Wallet.deployed();
     });
 
@@ -46,7 +39,7 @@ describe("Wallet Contract Testing Suite", function () {
         //test 1, correct approvers
         it('correct address approvers', async function () {
             // only three approvers allowed
-            expect(await Wallet.getApprovers()).to.have.members(addresses);
+            expect(await Wallet.getApprovers()).to.have.members(hre.getAddresses(approvers));
             expect(await Wallet.getApprovers()).to.have.length(3);
         });
 
@@ -198,7 +191,7 @@ describe("Wallet Contract Testing Suite", function () {
             data = "0x";
 
             await expect(connection.createTransaction(to, value, "0x")).to.emit(Wallet, "SubmitTransaction")
-                .withArgs(approver.address, to, value, data);
+                .withArgs(approver.address);
             
             expect(await Wallet.hasPendingTransaction()).to.be.true;
 
@@ -212,9 +205,6 @@ describe("Wallet Contract Testing Suite", function () {
             to = signers[Math.floor(Math.random()*(signers.length))].address;
             data = "0x"; 
 
-            //first try with a value of zero
-            await expect(connection.createTransaction(to, 0, data)).to.be.revertedWith("cannot send nothing");
-
             // use current balance to query a value greaters
             currBalance = await provider.getBalance(Wallet.address);
             value = currBalance.add(ethers.utils.parseEther('1'));
@@ -224,27 +214,8 @@ describe("Wallet Contract Testing Suite", function () {
 
             //finally query correctly with the entire account balance
             await expect(connection.createTransaction(to, currBalance, data)).to.emit(Wallet, "SubmitTransaction")
-                .withArgs(approver.address, to, currBalance, data);
+                .withArgs(approver.address);
 
-        });
-
-        //test 3, approver attempts to send to incorrect addressses
-        it('invalid addresses', async function () {
-            // pick invalis address
-            value = ethers.utils.parseEther('1');
-            data = '0x';
-
-            //try to send funds back to the contract
-            to = Wallet.address;
-            await expect(connection.createTransaction(to, value, data)).to.be.revertedWith("cannot send to contract's address");
-
-            //zero address
-            to = "0x0000000000000000000000000000000000000000";
-            await expect(connection.createTransaction(to, value, data)).to.be.revertedWith("cannot send to null address");
-
-            //owner address, cannot send here since funds are forwarded from the owners recieve()
-            to = owner.address;
-            await expect(connection.createTransaction(to, value, data)).to.be.revertedWith("cannot send to creator of this wallet");
         });
 
     });

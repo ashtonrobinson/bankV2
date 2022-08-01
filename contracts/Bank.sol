@@ -3,7 +3,6 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
 import "./Wallet.sol";
 
 // this is a multisignature account generator contract
@@ -181,5 +180,4 @@ contract Bank is Ownable {
         }
         return false;
     }
-
 }
