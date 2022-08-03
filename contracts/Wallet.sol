@@ -134,14 +134,16 @@ contract Wallet is Ownable{
         onlyApprover
         pendingTransactionExists
         notTransactionCreator
+        returns (bytes memory)
     {
         hasPendingTransaction = false;
         address confirmer = msg.sender;
 
-        (bool success,) = pendingTransaction.destination.call{value: pendingTransaction.value}(pendingTransaction.data);
+        (bool success, bytes memory data) = pendingTransaction.destination.call{value: pendingTransaction.value}(pendingTransaction.data);
 
         if (success){
             emit TransactionExecuted(confirmer);
+            return data;
         } else {
             revert("unable to execute");
         }

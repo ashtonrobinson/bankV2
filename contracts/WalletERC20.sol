@@ -32,7 +32,7 @@ contract WalletERC20 is Wallet {
 
     // set the tokenContract to be the one of 
     function setToken(address tokenAddr) 
-        external
+        public
         onlyApprover
     {
         tokenContract = tokenAddr;
@@ -52,7 +52,6 @@ contract WalletERC20 is Wallet {
     // create a pending transaction that transfers ERC-20 tokens
     function createERC20Transfer(address to, uint256 amount) 
         public
-        onlyApprover
         ercReady
         hasFunds(amount)
     {

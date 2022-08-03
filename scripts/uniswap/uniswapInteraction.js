@@ -9,7 +9,7 @@ const IUniswapV3PoolABI = abi;
 const provider = ethers.provider;
 
 // this needs to be dynamic
-const poolAddress = '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640';
+const poolAddress = '0x094a28b22e1b4218d590eA6Fa916B3C5e670Ba55';
 
 
 const poolContract = new ethers.Contract(poolAddress, IUniswapV3PoolABI, provider);
@@ -35,7 +35,6 @@ async function getPoolImmutables() {
     }
 }
 
-
 async function getPoolState(){
     const [liquidity, slot] = await Promise.all([poolContract.liquidity(), poolContract.slot0()])
 
@@ -58,8 +57,3 @@ getPoolImmutables().then((result) => {
 getPoolState().then((result) => {
     console.log(result);
 });
-
-
-
-
-
